@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://supplier.com/ws"
+           xmlns:tns="http://supplier.com/ws"
+           elementFormDefault="qualified">
+
+    <!-- Enhanced Product Type -->
+    <xs:complexType name="product">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long"/>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="description" type="xs:string"/>
+            <xs:element name="supplierPrice" type="xs:double"/>
+            <xs:element name="displayedPrice" type="xs:double"/>
+            <xs:element name="availableQuantity" type="xs:int"/>
+            <xs:element name="pictureUrl" type="xs:string" minOccurs="0"/>
+            <xs:element name="pictureData" type="xs:base64Binary" minOccurs="0"/>
+            <xs:element name="pictureFormat" type="xs:string" minOccurs="0"/>
+            <xs:element name="realTimeStock" type="xs:int"/>
+            <xs:element name="lastStockUpdate" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- === PAYMENT SOAP OPERATION === -->
+    <xs:element name="processPaymentRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="productId" type="xs:long"/>
+                <xs:element name="quantity" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="processPaymentResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="paymentId" type="xs:long" minOccurs="0"/>
+                <xs:element name="status" type="xs:string"/>
+                <xs:element name="stripeSessionId" type="xs:string" minOccurs="0"/>
+                <xs:element name="url" type="xs:string" minOccurs="0"/>
+                <xs:element name="message" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Get Product By ID -->
+    <xs:element name="getProductByIdRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:long"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getProductByIdResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="product" type="tns:product" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Get Available Stock -->
+    <xs:element name="getAvailableStockRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="productId" type="xs:long"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getAvailableStockResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="quantity" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Notify Payment Status -->
+    <xs:element name="notifyPaymentStatusRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="paymentId" type="xs:long"/>
+                <xs:element name="status" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="notifyPaymentStatusResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="success" type="xs:boolean"/>
+                <xs:element name="message" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Get All Products -->
+    <xs:element name="getAllProductsRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- Empty request - gets all products -->
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getAllProductsResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="products" type="tns:product" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

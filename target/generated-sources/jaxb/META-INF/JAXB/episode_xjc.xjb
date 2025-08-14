@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bindings version="3.0" xmlns="https://jakarta.ee/xml/ns/jaxb">
+  <!--
+
+Ce fichier a été généré par Eclipse Implementation of JAXB, v3.0.0 
+Voir https://eclipse-ee4j.github.io/jaxb-ri 
+Toute modification apportée à ce fichier sera perdue lors de la recompilation du schéma source. 
+Généré le : 2025.08.13 à 02:52:14 PM GMT+01:00 
+
+  -->
+  <bindings scd="x-schema::tns" xmlns:tns="http://supplier.com/ws">
+    <schemaBindings map="false">
+      <package name="com.supplier.ws"/>
+    </schemaBindings>
+    <bindings scd="tns:processPaymentRequest">
+      <class ref="com.supplier.ws.ProcessPaymentRequest"/>
+    </bindings>
+    <bindings scd="tns:processPaymentResponse">
+      <class ref="com.supplier.ws.ProcessPaymentResponse"/>
+    </bindings>
+    <bindings scd="tns:getProductByIdRequest">
+      <class ref="com.supplier.ws.GetProductByIdRequest"/>
+    </bindings>
+    <bindings scd="tns:getProductByIdResponse">
+      <class ref="com.supplier.ws.GetProductByIdResponse"/>
+    </bindings>
+    <bindings scd="~tns:product">
+      <class ref="com.supplier.ws.Product"/>
+    </bindings>
+    <bindings scd="tns:getAvailableStockRequest">
+      <class ref="com.supplier.ws.GetAvailableStockRequest"/>
+    </bindings>
+    <bindings scd="tns:getAvailableStockResponse">
+      <class ref="com.supplier.ws.GetAvailableStockResponse"/>
+    </bindings>
+    <bindings scd="tns:notifyPaymentStatusRequest">
+      <class ref="com.supplier.ws.NotifyPaymentStatusRequest"/>
+    </bindings>
+    <bindings scd="tns:notifyPaymentStatusResponse">
+      <class ref="com.supplier.ws.NotifyPaymentStatusResponse"/>
+    </bindings>
+    <bindings scd="tns:getAllProductsRequest">
+      <class ref="com.supplier.ws.GetAllProductsRequest"/>
+    </bindings>
+    <bindings scd="tns:getAllProductsResponse">
+      <class ref="com.supplier.ws.GetAllProductsResponse"/>
+    </bindings>
+  </bindings>
+</bindings>
+
