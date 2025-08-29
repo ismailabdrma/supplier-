@@ -88,7 +88,7 @@ public class SupplierEndpoint {
     public GetAllProductsResponse getAllProducts(@RequestPayload GetAllProductsRequest request) {
         log.info("SOAP request: getAllProducts");
         GetAllProductsResponse response = new GetAllProductsResponse();
-        List<Product> products = productService.getAllProductsWithStock();
+        List<Product> products = productService.getAllProducts();
         List<com.supplier.ws.Product> wsProducts = products.stream()
                 .map(this::convertToWsProduct)
                 .collect(Collectors.toList());
@@ -100,10 +100,17 @@ public class SupplierEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "processPaymentRequest")
     @ResponsePayload
     public ProcessPaymentResponse processPayment(@RequestPayload ProcessPaymentRequest request) {
-        log.info("SOAP processPayment for product {} x {}", request.getProductId(), request.getQuantity());
+        log.info("SOAP processPayment for product {} x {} with amount {} {}", 
+                request.getProductId(), request.getQuantity(), request.getAmount(), request.getCurrency());
         ProcessPaymentResponse response = new ProcessPaymentResponse();
         try {
-            String sessionUrl = paymentService.createCheckoutSession(request.getProductId(), request.getQuantity());
+            String sessionUrl = paymentService.createCheckoutSession(
+                request.getProductId(), 
+                request.getQuantity(), 
+                request.getAmount(), 
+                request.getCurrency(), 
+                request.getOrderId()
+            );
             Optional<Payment> paymentOpt = paymentService.getPaymentByProductAndQuantity(request.getProductId(), request.getQuantity());
             if (paymentOpt.isPresent()) {
                 Payment payment = paymentOpt.get();

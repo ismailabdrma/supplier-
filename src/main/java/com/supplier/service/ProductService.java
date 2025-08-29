@@ -113,6 +113,70 @@ public class ProductService {
 
         return products;
     }
+
+    public List<Product> getAllProductsWithStockForAdmin() {
+        return productRepository.findAll();
+    }
+
+    // Get products pending approval
+    public List<Product> getPendingApprovalProducts() {
+        return productRepository.findByApprovedFalse();
+    }
+
+    // Get inactive products
+    public List<Product> getInactiveProducts() {
+        return productRepository.findByActiveFalse();
+    }
+
+    // Approve a product
+    @Transactional
+    public boolean approveProduct(Long productId) {
+        Optional<Product> productOpt = productRepository.findById(productId);
+        if (productOpt.isPresent()) {
+            Product product = productOpt.get();
+            product.setApproved(true);
+            productRepository.save(product);
+            log.info("Product {} approved by admin", productId);
+            return true;
+        }
+        return false;
+    }
+
+    // Deactivate a product (soft delete)
+    @Transactional
+    public boolean deactivateProduct(Long productId) {
+        Optional<Product> productOpt = productRepository.findById(productId);
+        if (productOpt.isPresent()) {
+            Product product = productOpt.get();
+            product.setActive(false);
+            productRepository.save(product);
+            log.info("Product {} deactivated by admin", productId);
+            return true;
+        }
+        return false;
+    }
+
+    // Delete a product permanently (hard delete)
+    @Transactional
+    public boolean deleteProduct(Long productId) {
+        Optional<Product> productOpt = productRepository.findById(productId);
+        if (productOpt.isPresent()) {
+            Product product = productOpt.get();
+            
+            // First deactivate if not already deactivated
+            if (product.getActive()) {
+                product.setActive(false);
+                productRepository.save(product);
+                log.info("Product {} deactivated before deletion", productId);
+            }
+            
+            // Now delete permanently
+            productRepository.delete(product);
+            log.info("Product {} permanently deleted by admin", productId);
+            return true;
+        }
+        return false;
+    }
     @WebMethod
     @Transactional(readOnly = true)
     public Optional<Product> getProductByIdWithStock(Long id) {

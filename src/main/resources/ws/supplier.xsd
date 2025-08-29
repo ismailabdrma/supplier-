@@ -18,6 +18,8 @@
             <xs:element name="pictureFormat" type="xs:string" minOccurs="0"/>
             <xs:element name="realTimeStock" type="xs:int"/>
             <xs:element name="lastStockUpdate" type="xs:string"/>
+            <xs:element name="approved" type="xs:boolean"/>
+            <xs:element name="active" type="xs:boolean"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -27,6 +29,9 @@
             <xs:sequence>
                 <xs:element name="productId" type="xs:long"/>
                 <xs:element name="quantity" type="xs:int"/>
+                <xs:element name="amount" type="xs:double"/>
+                <xs:element name="currency" type="xs:string"/>
+                <xs:element name="orderId" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -100,7 +105,7 @@
     <xs:element name="getAllProductsRequest">
         <xs:complexType>
             <xs:sequence>
-                <!-- Empty request - gets all products -->
+                <!-- Empty request - gets all products regardless of approval status -->
             </xs:sequence>
         </xs:complexType>
     </xs:element>

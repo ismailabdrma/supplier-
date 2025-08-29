@@ -25,12 +25,17 @@ public class Product {
     @Column(nullable = false)
     private Double price;
 
-
     @Column(nullable = false)
     private Integer availableQuantity;
 
     @Column(length = 500)
     private String pictureUrl;
+
+    @Column(nullable = false)
+    private Boolean approved = false; // Admin approval status
+
+    @Column(nullable = false)
+    private Boolean active = true; // Product active status
 
     @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference

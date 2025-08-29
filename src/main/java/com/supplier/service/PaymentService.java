@@ -43,33 +43,53 @@ public class PaymentService {
      * Creates a Stripe checkout session, saves the Payment, returns checkout URL.
      */
     @Transactional
-    public String createCheckoutSession(Long productId, Integer quantity) throws StripeException {
-        log.info("Creating checkout session for product {} with quantity {}", productId, quantity);
+    public String createCheckoutSession(Long productId, Integer quantity, Double amount, String currency, String orderId) throws StripeException {
+        log.info("Creating checkout session for product {} with quantity {} and amount {} {}", productId, quantity, amount, currency);
+
+        // Check database connection by trying to access the repository
+        try {
+            long paymentCount = paymentRepository.count();
+            log.info("Database connection verified. Total payments in database: {}", paymentCount);
+        } catch (Exception e) {
+            log.error("Database connection failed: {}", e.getMessage(), e);
+            throw new RuntimeException("Database connection failed: " + e.getMessage());
+        }
 
         Optional<Product> productOpt = productService.getProductById(productId);
         if (productOpt.isEmpty()) {
+            log.error("Product not found with ID: {}", productId);
             throw new RuntimeException("Product not found");
         }
 
         Product product = productOpt.get();
+        log.info("Found product: {} with price: {}", product.getName(), product.getPrice());
+
+        // Calculate amount from product price if not provided
+        if (amount == null) {
+            amount = product.getPrice() * quantity;
+            log.info("Calculated amount from product price: {} * {} = {}", product.getPrice(), quantity, amount);
+        }
 
         // Check stock availability
         Optional<Integer> availableStock = productService.getAvailableStock(productId);
         if (availableStock.isEmpty() || availableStock.get() < quantity) {
+            log.error("Insufficient stock for product {}: requested {}, available {}", productId, quantity, availableStock.orElse(null));
             throw new RuntimeException("Insufficient stock");
         }
+        
+        log.info("Stock check passed: requested {}, available {}", quantity, availableStock.get());
 
         SessionCreateParams params = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl(successUrl + "?session_id={CHECKOUT_SESSION_ID}")
+                .setSuccessUrl(successUrl)
                 .setCancelUrl(cancelUrl)
                 .addLineItem(
                         SessionCreateParams.LineItem.builder()
                                 .setQuantity((long) quantity)
                                 .setPriceData(
                                         SessionCreateParams.LineItem.PriceData.builder()
-                                                .setCurrency("usd")
-                                                .setUnitAmount((long) (product.getPrice() * 100))
+                                                .setCurrency(currency.toLowerCase())
+                                                .setUnitAmount((long) (amount * 100))
                                                 .setProductData(
                                                         SessionCreateParams.LineItem.PriceData.ProductData.builder()
                                                                 .setName(product.getName())
@@ -82,18 +102,31 @@ public class PaymentService {
                 )
                 .putMetadata("product_id", productId.toString())
                 .putMetadata("quantity", quantity.toString())
+                .putMetadata("order_id", orderId)
                 .build();
 
         Session session = Session.create(params);
+        log.info("Stripe session created successfully with ID: {}", session.getId());
 
         // Save payment record
-        Payment payment = new Payment();
-        payment.setProductId(productId);
-        payment.setAmount(product.getPrice() * quantity);
-        payment.setStatus(Payment.PaymentStatus.PENDING);
-        payment.setStripeSessionId(session.getId());
-        payment.setQuantity(quantity);
-        paymentRepository.save(payment);
+        try {
+            Payment payment = new Payment();
+            payment.setProductId(productId);
+            payment.setOrderId(orderId);
+            payment.setAmount(amount);
+            payment.setStatus(Payment.PaymentStatus.PENDING);
+            payment.setStripeSessionId(session.getId());
+            payment.setQuantity(quantity);
+            payment.setCurrency(currency);
+            
+            log.info("Payment object created: {}", payment);
+            
+            paymentRepository.save(payment);
+            log.info("Payment record saved successfully with ID: {}", payment.getId());
+        } catch (Exception e) {
+            log.error("Error saving payment record: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to save payment record: " + e.getMessage());
+        }
 
         return session.getUrl();
     }

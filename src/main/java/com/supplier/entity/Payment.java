@@ -34,7 +34,15 @@ public class Payment {
     @Column(nullable = false)
     private LocalDateTime timestamp;
     
+    @Column(nullable = false)
     private Integer quantity = 1;
+    
+    @Column(nullable = false)
+    private String currency = "EUR";
+    
+    @Column(nullable = false)
+    private String orderId;
+    
     @CreationTimestamp
     private LocalDateTime createdAt;
     

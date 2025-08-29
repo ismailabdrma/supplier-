@@ -36,6 +36,60 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
+    @GetMapping("/admin/all")
+    public ResponseEntity<List<Product>> getAllProductsForAdmin() {
+        log.info("Admin fetching all products (including pending approval)");
+        List<Product> products = productService.getAllProducts();
+        return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/admin/pending")
+    public ResponseEntity<List<Product>> getPendingApprovalProducts() {
+        log.info("Admin fetching pending approval products");
+        List<Product> products = productService.getPendingApprovalProducts();
+        return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/admin/inactive")
+    public ResponseEntity<List<Product>> getInactiveProducts() {
+        log.info("Admin fetching inactive products");
+        List<Product> products = productService.getInactiveProducts();
+        return ResponseEntity.ok(products);
+    }
+
+    @PostMapping("/admin/approve/{productId}")
+    public ResponseEntity<String> approveProduct(@PathVariable Long productId) {
+        log.info("Admin approving product: {}", productId);
+        boolean success = productService.approveProduct(productId);
+        if (success) {
+            return ResponseEntity.ok("Product approved successfully");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/admin/deactivate/{productId}")
+    public ResponseEntity<String> deactivateProduct(@PathVariable Long productId) {
+        log.info("Admin deactivating product: {}", productId);
+        boolean success = productService.deactivateProduct(productId);
+        if (success) {
+            return ResponseEntity.ok("Product deactivated successfully");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/admin/{productId}")
+    public ResponseEntity<String> deleteProduct(@PathVariable Long productId) {
+        log.info("Admin deleting product: {}", productId);
+        boolean success = productService.deleteProduct(productId);
+        if (success) {
+            return ResponseEntity.ok("Product deleted successfully");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable Long id) {
         log.info("Fetching product with id: {}", id);

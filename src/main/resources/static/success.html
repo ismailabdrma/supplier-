@@ -35,23 +35,29 @@
     </div>
 
     <script>
-        // Display session ID from URL parameter
+        // Get URL parameters
         const urlParams = new URLSearchParams(window.location.search);
-        const sessionId = urlParams.get('session_id');
-        if (sessionId) {
-            document.getElementById('session-id').textContent = sessionId;
-            
-            // Notify backend of successful payment
-            fetch(`/api/payments/success/${sessionId}`, { method: 'POST' })
-                .then(response => {
-                    if (response.ok) {
-                        console.log('Payment success notification sent');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error notifying payment success:', error);
-                });
+        const stripeSessionId = urlParams.get('session_id');
+        const orderId = urlParams.get('order_id') || '41'; // Default order ID
+        const supplierId = '1'; // Your supplier ID
+        
+        // Display session information
+        if (stripeSessionId) {
+            document.getElementById('session-id').textContent = stripeSessionId;
         }
+        
+        console.log('Payment successful! Redirecting to platform...');
+        console.log('Session ID:', stripeSessionId);
+        console.log('Order ID:', orderId);
+        console.log('Supplier ID:', supplierId);
+        
+        // Wait 2 seconds for payment logging to complete, then redirect
+        setTimeout(() => {
+            // Redirect to our redirect endpoint first (not directly to Angular)
+            const redirectUrl = `http://localhost:8080/api/supplier/redirect?order_id=${orderId}&supplier_id=${supplierId}&session_id=${stripeSessionId}`;
+            console.log('Redirecting to our redirect endpoint:', redirectUrl);
+            window.location.href = redirectUrl;
+        }, 2000);
     </script>
 </body>
 </html>
